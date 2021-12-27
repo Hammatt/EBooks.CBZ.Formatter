@@ -15,12 +15,15 @@ namespace EBooks.CBZ.Formatter.DataAccess
 
             foreach(ZipArchiveEntry zipArchiveEntry in inputFileArchive.Entries)
             {
-                using Stream entryStream = zipArchiveEntry.Open();
-                MemoryStream memoryStream = new MemoryStream();
-                await entryStream.CopyToAsync(memoryStream, cancellationToken);
-                memoryStream.Seek(0, SeekOrigin.Begin);
+                if (zipArchiveEntry.Length > 0)
+                {
+                    using Stream entryStream = zipArchiveEntry.Open();
+                    MemoryStream memoryStream = new MemoryStream();
+                    await entryStream.CopyToAsync(memoryStream, cancellationToken);
+                    memoryStream.Seek(0, SeekOrigin.Begin);
 
-                result.Add(new InputFile(memoryStream, zipArchiveEntry.Name));
+                    result.Add(new InputFile(memoryStream, zipArchiveEntry.Name));
+                }
             }
 
             return result;
