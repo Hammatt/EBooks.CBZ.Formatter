@@ -14,8 +14,10 @@ namespace EBooks.CBZ.Formatter.Domain
             }
         }
 
-        public static async Task FormatCbzAsync(List<InputFile> inputFiles, Stream outputStream, CancellationToken cancellationToken)
+        public static async Task<Stream> FormatCbzAsync(List<InputFile> inputFiles, CancellationToken cancellationToken)
         {
+            Stream outputStream = new MemoryStream();
+
             inputFiles.Sort(new InputFileComparer());
 
             using ZipArchive formatedCbz = new ZipArchive(outputStream, ZipArchiveMode.Create, true);
@@ -27,8 +29,10 @@ namespace EBooks.CBZ.Formatter.Domain
                 ZipArchiveEntry entry = formatedCbz.CreateEntry(GetFileName(inputFileIndex, inputFile.Filename));
                 using Stream entryStream = entry.Open();
                 await inputFile.Content.CopyToAsync(entryStream, cancellationToken);
-                await entryStream.FlushAsync();
+                await entryStream.FlushAsync(cancellationToken);
             }
+
+            return outputStream;
         }
 
         private static string GetFileName(int index, string originalFilename)

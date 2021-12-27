@@ -17,8 +17,7 @@ namespace EBooks.CBZ.Formatter.Tests.Domain
             List<InputFile> testInput = new List<InputFile>();
             testInput.Add(new InputFile(new MemoryStream(), inputFilename));
 
-            using MemoryStream testOutput = new MemoryStream();
-            await CbzFormatter.FormatCbzAsync(testInput, testOutput, CancellationToken.None);
+            using Stream testOutput = await CbzFormatter.FormatCbzAsync(testInput, CancellationToken.None);
             
             testOutput.Seek(0, SeekOrigin.Begin);
             using ZipArchive outputArchive = new ZipArchive(testOutput);
@@ -33,9 +32,8 @@ namespace EBooks.CBZ.Formatter.Tests.Domain
             testInput.Add(new InputFile(new MemoryStream(new byte[] { 2 }), "z.png"));
             testInput.Add(new InputFile(new MemoryStream(new byte[] { 1 }), "a.png"));
 
-            using MemoryStream testOutput = new MemoryStream();
-            await CbzFormatter.FormatCbzAsync(testInput, testOutput, CancellationToken.None);
-
+            using Stream testOutput =  await CbzFormatter.FormatCbzAsync(testInput, CancellationToken.None);
+            
             testOutput.Seek(0, SeekOrigin.Begin);
             using ZipArchive outputArchive = new ZipArchive(testOutput);
             Assert.Equal($"0000.png", outputArchive.Entries[0].Name);
@@ -54,9 +52,8 @@ namespace EBooks.CBZ.Formatter.Tests.Domain
             testInput.Add(new InputFile(new MemoryStream(new byte[] { 1 }), "blah.png"));
             uint zipLeadBytes = 0x04034b50; //note, this is 0x06054b50 if it is an empty zip, which is why we have had to add a dummy file to be more realistic to the actual use case
 
-            using MemoryStream testOutput = new MemoryStream();
-            await CbzFormatter.FormatCbzAsync(testInput, testOutput, CancellationToken.None);
-
+            using Stream testOutput = await CbzFormatter.FormatCbzAsync(testInput, CancellationToken.None);
+            
             testOutput.Seek(0, SeekOrigin.Begin);
             byte[] leadBytes = new byte[4];
             await testOutput.ReadAsync(leadBytes);

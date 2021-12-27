@@ -3,9 +3,9 @@ using System.IO.Compression;
 
 namespace EBooks.CBZ.Formatter.DataAccess
 {
-    public class InputFilesRepository
+    public static class InputFilesRepository
     {
-        public async Task<List<InputFile>> GetInputFilesAsync(string fileLocation, CancellationToken cancellationToken)
+        public async static Task<List<InputFile>> GetInputFilesAsync(string fileLocation, CancellationToken cancellationToken)
         {
             List<InputFile> result = new List<InputFile>();
 
@@ -17,7 +17,7 @@ namespace EBooks.CBZ.Formatter.DataAccess
             {
                 using Stream entryStream = zipArchiveEntry.Open();
                 MemoryStream memoryStream = new MemoryStream();
-                await entryStream.CopyToAsync(memoryStream);
+                await entryStream.CopyToAsync(memoryStream, cancellationToken);
                 memoryStream.Seek(0, SeekOrigin.Begin);
 
                 result.Add(new InputFile(memoryStream, zipArchiveEntry.Name));

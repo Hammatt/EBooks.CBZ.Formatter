@@ -1,9 +1,5 @@
-﻿using EBooks.CBZ.Formatter.DataAccess;
-using EBooks.CBZ.Formatter.Domain;
-using EBooks.CBZ.Formatter.Models;
+﻿using EBooks.CBZ.Formatter;
 using System.CommandLine;
-
-InputFilesRepository inputFilesRepository = new InputFilesRepository();
 
 Option<FileInfo> inputFileOption = new Option<FileInfo>("--input")
 {
@@ -22,12 +18,7 @@ rootCommand.Description = "A quick tool to help format CBZ files.";
 
 rootCommand.SetHandler(async (FileInfo input, FileInfo output) =>
 {
-    List<InputFile> inputFiles = await inputFilesRepository.GetInputFilesAsync(input.FullName, CancellationToken.None);
-
-    Directory.CreateDirectory(output.DirectoryName);
-    using FileStream outputStream = File.Create(output.FullName);
-
-    await CbzFormatter.FormatCbzAsync(inputFiles, outputStream, CancellationToken.None);
+    await Compositions.FormatCbzCompositionAsync(input, output, CancellationToken.None);
 }, inputFileOption, outputFileOption);
 
 await rootCommand.InvokeAsync(args);
